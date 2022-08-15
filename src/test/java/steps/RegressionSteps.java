@@ -8,9 +8,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import library.DataGroup;
-import library.RequestHeader;
-import library.YamlHelper;
+import library.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +26,15 @@ import java.util.function.Consumer;
 public class RegressionSteps {
 
     private String file, scenario;
+    private  String token;
     private YamlHelper yamlHelper;
     int actualHttpStatusCode;
     private WebClient.ResponseSpec responseSpec;
     private RequestHeader requestHeader;
     private HttpHeaders responseHeader;
     private ObjectMapper mapper = new ObjectMapper();
+    private RequestBody _requestBody = new RequestBody();
+    private TokenGeneration tokenGeneration;
 
 
     // following is used to create Report
@@ -86,7 +87,25 @@ public class RegressionSteps {
         }
 
     }
+    @And("The customer logs into app with userName {string} and password {string}")
+    public void the_customer_logs_into_app_with_username_and_password(String userName, String password){
+        String _userName = null;
+        String _password = "xxxxxxxxxx";
 
+        try {
+            userName = (String) DataGroup.currentTestData.get("userLogin");
+            password = (String) DataGroup.currentTestData.get("password");
+            tokenGeneration = new TokenGeneration();
+            token = tokenGeneration.getToken(userName, password);
+
+            _userName = userName;
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally{
+            scenarioContext.addScenarioLines(String.format("The customer logs into app with userName %s and password %s", _userName, _password));
+        }
+
+    }
     @When("The customer calls {string} and provides {string} as wells as {string}")
     public void the_customer_calls_and_provides_as_well_as(String applicationName, String fromAccount, String toAccount) {
         String _applicationName = null;
@@ -95,11 +114,12 @@ public class RegressionSteps {
         try {
             yamlHelper = new YamlHelper(applicationName);
             DataGroup.applicationDefaultTestData = yamlHelper.getDefaultData().get(applicationName);
+            //if any token
+            DataGroup.applicationDefaultTestData.put("Header_Authorization", token);
             DataGroup.applicationDefaultTestData.put("applicationName", applicationName);
             DataGroup.finalTestData = yamlHelper.getFinalTestData(DataGroup.applicationDefaultTestData, DataGroup.currentTestData);
             _applicationName = applicationName;
             _fromAccountId = String.valueOf(DataGroup.finalTestData.get(fromAccount));
-            ;
             _toAccountId = String.valueOf(DataGroup.finalTestData.get(toAccount));
         } catch (Exception e) {
             scenarioContext.setScenarioPassed(false);
@@ -126,6 +146,9 @@ public class RegressionSteps {
 
         try {
             DataGroup.finalTestData.put("Header-client-channel", channel);
+
+            //set request body if it is post request
+            body = _requestBody.setRequestBody(apiPath, DataGroup.finalTestData);
             headers = requestHeader.setRequestHeader(DataGroup.finalTestData);
             url = HttpCall.setUrl((String) DataGroup.finalTestData.get("applicationName"), region);
             uri = HttpCall.setUri(apiPath);
@@ -136,6 +159,7 @@ public class RegressionSteps {
             responseSpec = webClient.method(HttpMethod.resolve(method))
                     .uri(finalUri)
                     .headers(headers)
+
                     .retrieve();
             _apiPath = apiPath;
             _region = region;

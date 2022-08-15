@@ -29,7 +29,7 @@ public class ReportHook {
         report.scenarioContexts.add(scenarioContext);
     }
 
-    @AfterAll
+    @AfterAll()
     public static void after_all(){
         StringBuilder html;
         endTime = System.currentTimeMillis();

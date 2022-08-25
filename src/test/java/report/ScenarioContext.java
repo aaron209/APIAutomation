@@ -100,7 +100,7 @@ public class ScenarioContext {
     }
 
     public void setRequestBody(String requestBody){
-        this.responseBody = requestBody;
+        this.requestBody = requestBody;
     }
 
     public Map<String, String> getResponseHeaders(){

@@ -1,8 +1,13 @@
 Regression:
   1:
     scenario: Regression - validate API
-    fromAccountId: 555555
-    toAccountId: 777777
-    responseCode: 200
-    Header_accountId: 4524
+   # fromAccountId: 555555
+   # toAccountId: 777777
+   # responseCode: 200
+   # Header_accountId: 4524
+    name: this is my name
+    job: this is my job
+    responseCode: 201
+    validateName: $['id']
+    expectedName: this is my name
 

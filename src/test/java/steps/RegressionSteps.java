@@ -14,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.testng.Assert;
 import report.ReportGenerator;
 import report.ScenarioContext;
 import java.time.LocalDateTime;
@@ -115,7 +116,7 @@ public class RegressionSteps {
             yamlHelper = new YamlHelper(applicationName);
             DataGroup.applicationDefaultTestData = yamlHelper.getDefaultData().get(applicationName);
             //if any token
-            DataGroup.applicationDefaultTestData.put("Header_Authorization", token);
+           // DataGroup.applicationDefaultTestData.put("Header_Authorization", token);
             DataGroup.applicationDefaultTestData.put("applicationName", applicationName);
             DataGroup.finalTestData = yamlHelper.getFinalTestData(DataGroup.applicationDefaultTestData, DataGroup.currentTestData);
             _applicationName = applicationName;
@@ -141,8 +142,8 @@ public class RegressionSteps {
         String uri = null;
         String finalUri = null;
         //for query path params
-        String transferType = null;
-        String transferDirection = null;
+        //String transferType = null;
+        //String transferDirection = null;
 
         try {
             DataGroup.finalTestData.put("Header-client-channel", channel);
@@ -152,14 +153,13 @@ public class RegressionSteps {
             headers = requestHeader.setRequestHeader(DataGroup.finalTestData);
             url = HttpCall.setUrl((String) DataGroup.finalTestData.get("applicationName"), region);
             uri = HttpCall.setUri(apiPath);
-            transferType = String.valueOf(DataGroup.finalTestData.get("transferType"));
-            transferDirection = String.valueOf(DataGroup.finalTestData.get("transferDirection"));
-            finalUri = uri + "?filter[transferType]=" + transferType + "&filter[transferDirection]=" + transferDirection;
+           // transferType = String.valueOf(DataGroup.finalTestData.get("transferType"));
+           // transferDirection = String.valueOf(DataGroup.finalTestData.get("transferDirection"));
+           // finalUri = uri + "?filter[transferType]=" + transferType + "&filter[transferDirection]=" + transferDirection;
             WebClient webClient = WebClient.create(url);
             responseSpec = webClient.method(HttpMethod.resolve(method))
-                    .uri(finalUri)
+                    .uri(uri) // use finalUri if query param
                     .headers(headers)
-
                     .retrieve();
             _apiPath = apiPath;
             _region = region;
@@ -170,7 +170,7 @@ public class RegressionSteps {
             e.printStackTrace();
 
         } finally {
-            scenarioContext.setUrl(url + "/" + finalUri);
+            scenarioContext.setUrl(url + "/" + uri);
             scenarioContext.setMethod(_method);
             scenarioContext.setRequestBody(requestBody);
             scenarioContext.setRequestHeaders(RequestHeader.getHeaderAsMap());
@@ -230,8 +230,9 @@ public class RegressionSteps {
 
             DocumentContext jsonContext = JsonPath.parse(responseBody);
             String actualResult = jsonContext.read(validateField).toString();
-            if (!String.valueOf(expectedValue).equalsIgnoreCase(String.valueOf(actualResult))) {
+            if (!String.valueOf(expectedValue).equalsIgnoreCase((actualResult))) {
                 scenarioContext.setErrorMessage("Response body validation failed : " + expectedValue + ", but actual value " + actualResult);
+                Assert.assertTrue(false, "Actual value does not match");
             }
         } catch (Exception e) {
             scenarioContext.setErrorMessage("JsonPath.parse error: " + e.getMessage());

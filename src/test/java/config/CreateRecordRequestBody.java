@@ -11,42 +11,58 @@ public class CreateRecordRequestBody {
     @JsonProperty("name")
     private String name;
 
-    @JsonProperty("job")
-    private String job;
+    @JsonProperty("salary")
+    private String salary;
+
+    @JsonProperty("age")
+    private String age;
 
     private Map<String, Object> data;
 
-    public CreateRecordRequestBody(Map<String, Object> finalTestData){
+    public CreateRecordRequestBody(Map<String, Object> finalTestData) {
         data = finalTestData;
     }
-    public void setName(String name){
+
+    public void setName(String name) {
         this.name = name;
     }
-    public String getName(){
+
+    public String getName() {
         return name = convertToString(data.get("name"));
     }
-    public void setJob(String job){
-        this.job = job;
-    }
-    public String getJob(){
-        return job = convertToString(data.get("job"));
+
+    public void setJob(String salary) {
+        this.salary = salary;
     }
 
-    public static String setRequestBody(Map<String, Object> finalTestData){
+    public String getJob() {
+        return salary = convertToString(data.get("salary"));
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    public String getAge() {
+        return age = convertToString(data.get("age"));
+    }
+
+    public static String setRequestBody(Map<String, Object> finalTestData) {
         CreateRecordRequestBody body = null;
         String requestBody = null;
         try {
             body = new CreateRecordRequestBody(finalTestData);
             ObjectMapper objectMapper = new ObjectMapper();
             requestBody = objectMapper.writeValueAsString(body);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return requestBody;
     }
-    private String convertToString(Object object){
+
+    private String convertToString(Object object) {
         String convert = String.valueOf(object);
-        if(convert == null)
+        if (convert == null)
             return null;
         return convert;
     }

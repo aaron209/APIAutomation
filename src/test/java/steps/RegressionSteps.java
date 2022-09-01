@@ -96,6 +96,14 @@ public class RegressionSteps {
         try {
             userName = (String) DataGroup.currentTestData.get("userLogin");
             password = (String) DataGroup.currentTestData.get("password");
+
+            //alternative way to read credentials from json file
+            JsonFileReader jsonFileReader = new JsonFileReader();
+            userName = jsonFileReader.getCredentials("1").userName;
+            password = jsonFileReader.getCredentials("1").password;
+            System.out.println(userName);
+            System.out.println(password);
+
             tokenGeneration = new TokenGeneration();
             token = tokenGeneration.getToken(userName, password);
 

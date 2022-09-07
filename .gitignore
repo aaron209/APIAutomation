@@ -1,0 +1,24 @@
+HELP.md
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+target
+src/test/java/report/testReport
+.idea
+*.xml
+*.md
+README.md
+
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+###Intellij Idea ###
+.idea
+*.iws
+*.iml
+*.ipr
+README.md
+
